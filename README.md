@@ -28,18 +28,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Project Structure
 
 /DishDispatch
-│
-├── LICENSE         <-- Your license file goes here
-├── README.md       <-- Your README references the LICENSE file
-├── food_order_app.py
+|
+├── LICENSE\         
+├── README.md\      
+├── food_order_app.py\
 └── other_project_files...
 
 
 
-Folder Structure Breakdown:
-data/: Holds data files, like customer orders or menu items.
-logs/: Stores log files (can be empty initially).
-scripts/: Contains Python scripts that might support your app.
-LICENSE: Your project’s license file.
-README.md: Documentation for the project.
-food_order_app.py: The main script of the project.
+Folder Structure Breakdown:\
+**data**/: Holds data files, like customer orders or menu items.\
+**logs**/: Stores log files (can be empty initially).\
+**scripts**/: Contains Python scripts that might support the app.\
+**LICENSE**: Your project’s license file.\
+**README.md**: Documentation for the project.\
+**food_order_app.py**: The main script of the project.
