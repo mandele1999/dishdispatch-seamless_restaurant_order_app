@@ -15,12 +15,6 @@ DishDispatch is a Python-based restaurant order management app designed to strea
 2. Similar orders made within a 5-minute window are grouped.
 3. All grouped orders are dispatched at the end of the countdown to the respective tables.
 
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/mandele1999/dishdispatch.git
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) file for details.
