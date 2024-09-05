@@ -28,12 +28,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Project Structure
 
 /DishDispatch
-
 │
-├── LICENSE     
-├── README.md    
+├── LICENSE         <-- Your license file goes here
+├── README.md       <-- Your README references the LICENSE file
 ├── food_order_app.py
 └── other_project_files...
+
 
 
 Folder Structure Breakdown:
