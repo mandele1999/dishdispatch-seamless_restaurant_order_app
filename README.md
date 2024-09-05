@@ -23,20 +23,10 @@ DishDispatch is a Python-based restaurant order management app designed to strea
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE) file for details.
 
-## Project Structure
+**Folder Structure Breakdown:**\
 
-/DishDispatch
-|
-├── LICENSE\         
-├── README.md\      
-├── food_order_app.py\
-└── other_project_files...
-
-
-
-Folder Structure Breakdown:\
 **data**/: Holds data files, like customer orders or menu items.\
 **logs**/: Stores log files (can be empty initially).\
 **scripts**/: Contains Python scripts that might support the app.\
