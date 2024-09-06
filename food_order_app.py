@@ -15,7 +15,7 @@ def queue_order(food_item, table):
     order = {"table": table, "timestamp": current_time}
     order_queue[food_item].append(order)
     if len(order_queue[food_item]) == 1:
-        threading.Timer(0.1 * 60, dispatch_orders, [food_item]).start()
+        threading.Timer(10, dispatch_orders, [food_item]).start()
 
 def take_order():
     food_item = input("Enter food item: ")
