@@ -67,7 +67,7 @@ def queue_order(food_item, table):
         # Start a timer if it's the first order for that food item
         if len(order_queue[food_item]) == 1:
             print(f"New order received for {food_item}. Dispatching in 5 minutes.")
-            threading.Timer(5 * 60, dispatch_orders, [food_item]).start()  # 5 minutes delay
+            threading.Timer(10, dispatch_orders, [food_item]).start()  # 5 minutes delay
         else:
             print(f"Another order for {food_item} added to the batch.")
         logging.info(f"Order queued for {food_item} at table {table}")
