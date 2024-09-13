@@ -1,3 +1,7 @@
 2024-09-13 11:29:14,674 - WARNING - Invalid food item selected: 2
 2024-09-13 11:29:40,785 - WARNING - Empty table number provided
 2024-09-13 11:29:52,539 - INFO - Database backup created: orders_backup_20240913112952.db
+2024-09-13 12:02:41,736 - INFO - Order queued for Burger at table 5
+2024-09-13 12:05:07,033 - INFO - Order queued for Pizza at table 5
+2024-09-13 12:06:43,456 - INFO - Order queued for Burger at table 2
+2024-09-13 12:06:53,468 - ERROR - Database error during dispatch: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 2948 and this is thread id 13024.
