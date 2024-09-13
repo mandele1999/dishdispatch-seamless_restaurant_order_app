@@ -1,0 +1,3 @@
+2024-09-13 11:29:14,674 - WARNING - Invalid food item selected: 2
+2024-09-13 11:29:40,785 - WARNING - Empty table number provided
+2024-09-13 11:29:52,539 - INFO - Database backup created: orders_backup_20240913112952.db
