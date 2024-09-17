@@ -52,7 +52,30 @@ def dispatch_orders(food_item):
     except Exception as e:
         logging.error(f"Unexpected error during dispatch: {e}")
 
-# Function to queue new orders and dispatch after a delay
+# # Function to queue new orders and dispatch after a delay
+# def queue_order(food_item, table):
+#     try:
+#         current_time = time.time()
+#         order = {"table": table, "timestamp": current_time}
+#         order_queue[food_item].append(order)
+
+#         # Save to the database with pending status
+#         cursor.execute("INSERT INTO orders (food_item, table_number, timestamp, status) VALUES (?, ?, ?, 'pending')", 
+#                        (food_item, table, current_time))
+#         conn.commit()
+
+#         # Start a timer if it's the first order for that food item
+#         if len(order_queue[food_item]) == 1:
+#             print(f"New order received for {food_item}. Dispatching in 5 minutes.")
+#             threading.Timer(10, dispatch_orders, [food_item]).start()  # 5 minutes delay
+#         else:
+#             print(f"Another order for {food_item} added to the batch.")
+#         logging.info(f"Order queued for {food_item} at table {table}")
+#     except sqlite3.Error as e:
+#         logging.error(f"Database error during order queuing: {e}")
+#     except Exception as e:
+#         logging.error(f"Unexpected error during order queuing: {e}")
+# Modify queue_order to handle each item as before
 def queue_order(food_item, table):
     try:
         current_time = time.time()
@@ -67,7 +90,7 @@ def queue_order(food_item, table):
         # Start a timer if it's the first order for that food item
         if len(order_queue[food_item]) == 1:
             print(f"New order received for {food_item}. Dispatching in 5 minutes.")
-            threading.Timer(10, dispatch_orders, [food_item]).start()  # 5 minutes delay
+            threading.Timer(15, dispatch_orders, [food_item]).start()  # 5 minutes delay
         else:
             print(f"Another order for {food_item} added to the batch.")
         logging.info(f"Order queued for {food_item} at table {table}")
@@ -93,21 +116,44 @@ def display_menu():
     for item, price in menu.items():
         print(f"{item}: ${price}")
 
-# Function to take an order from the customer
+# # Function to take an order from the customer
+# def take_order():
+#     display_menu()
+#     food_item = input("Select a food item from the menu: ").strip()
+#     if food_item not in menu:
+#         print("Invalid item. Please choose from the menu.")
+#         logging.warning(f"Invalid food item selected: {food_item}")
+#         return
+#     table = input("Enter Table number: ").strip()
+#     if not table:
+#         print("Table number cannot be empty.")
+#         logging.warning("Empty table number provided")
+#         return
+#     queue_order(food_item, table)
+#     print(f"Order for {food_item} at table {table} has been placed.")
+# Function to take an order from the customer (multiple items)
 def take_order():
     display_menu()
-    food_item = input("Select a food item from the menu: ").strip()
-    if food_item not in menu:
-        print("Invalid item. Please choose from the menu.")
-        logging.warning(f"Invalid food item selected: {food_item}")
+    food_items = input("Select food items from the menu (comma-separated): ").strip().split(',')
+    food_items = [item.strip() for item in food_items]  # Strip whitespace
+    invalid_items = [item for item in food_items if item not in menu]
+    
+    # Validate all food items
+    if invalid_items:
+        print(f"Invalid items: {', '.join(invalid_items)}. Please choose valid items from the menu.")
+        logging.warning(f"Invalid food items selected: {', '.join(invalid_items)}")
         return
+
     table = input("Enter Table number: ").strip()
     if not table:
         print("Table number cannot be empty.")
         logging.warning("Empty table number provided")
         return
-    queue_order(food_item, table)
-    print(f"Order for {food_item} at table {table} has been placed.")
+
+    # Queue each item in the order
+    for food_item in food_items:
+        queue_order(food_item, table)
+    print(f"Order for {', '.join(food_items)} at table {table} has been placed.")
 
 # Admin panel for managing orders and viewing history
 def view_order_history():
