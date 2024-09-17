@@ -53,26 +53,27 @@ def dispatch_orders(food_item):
         logging.error(f"Unexpected error during dispatch: {e}")
 
 # Function to queue new orders and dispatch after a delay
-def queue_order(food_item, table):
+def queue_order(food_items, table):
     try:
         current_time = time.time()
-        order = {"table": table, "timestamp": current_time}
-        order_queue[food_item].append(order)
+        for food_item in food_items:
+            order = {"table": table, "timestamp": current_time}
+            order_queue[food_item].append(order)
 
-        # Save to the database with pending status
-        cursor.execute("INSERT INTO orders (food_item, table_number, timestamp, status) VALUES (?, ?, ?, 'pending')", 
-                       (food_item, table, current_time))
-        conn.commit()
+            # Save to the database with pending status
+            cursor.execute("INSERT INTO orders (food_item, table_number, timestamp, status) VALUES (?, ?, ?, 'pending')", 
+                           (food_item, table, current_time))
+            conn.commit()
 
-        # Start a timer if it's the first order for that food item
-        if len(order_queue[food_item]) == 1:
-            st.write(f"New order received for {food_item}. Dispatching in 5 minutes.")
-            # Using a shorter time (10 seconds) for demonstration
-            time.sleep(10)
-            dispatch_orders(food_item)
-        else:
-            st.write(f"Another order for {food_item} added to the batch.")
-        logging.info(f"Order queued for {food_item} at table {table}")
+            # Start a timer if it's the first order for that food item
+            if len(order_queue[food_item]) == 1:
+                st.write(f"New order received for {food_item}. Dispatching in 5 minutes.")
+                # Using a shorter time (10 seconds) for demonstration
+                time.sleep(10)
+                dispatch_orders(food_item)
+            else:
+                st.write(f"Another order for {food_item} added to the batch.")
+        logging.info(f"Order queued for {', '.join(food_items)} at table {table}")
     except sqlite3.Error as e:
         logging.error(f"Database error during order queuing: {e}")
     except Exception as e:
@@ -136,13 +137,13 @@ def main():
 
     if choice == "Take an Order":
         display_menu()
-        food_item = st.selectbox("Select a food item", list(menu.keys()))
+        food_items = st.multiselect("Select food items", list(menu.keys()))  # Allows multiple items selection
         table = st.text_input("Enter Table number")
         if st.button("Place Order"):
-            if food_item and table:
-                queue_order(food_item, table)
+            if food_items and table:
+                queue_order(food_items, table)
             else:
-                st.write("Please provide both food item and table number.")
+                st.write("Please provide both food items and table number.")
     
     elif choice == "Admin Panel":
         admin_choice = st.selectbox("Admin Options", ["View Order History", "Generate Summary Report"])
