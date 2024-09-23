@@ -1,7 +1,6 @@
 import time
 import sqlite3
 import shutil
-import json  # For serializing items
 import logging
 import streamlit as st
 from collections import defaultdict
@@ -10,7 +9,7 @@ from collections import defaultdict
 logging.basicConfig(filename='dishdispatch.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-# A defaultdict to store current orders by table
+# A defaultdict to store current orders by food item before dispatch
 order_queue = defaultdict(list)
 
 # Menu for food items and prices
@@ -26,12 +25,12 @@ menu = {
 conn = sqlite3.connect('orders.db', check_same_thread=False)
 cursor = conn.cursor()
 
-# Update table to store orders if it doesn't already exist
+# Create table to store orders if it doesn't already exist
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    food_item TEXT,
     table_number TEXT,
-    items TEXT,  -- New column for storing multiple items
     timestamp REAL,
     status TEXT
 )
@@ -39,50 +38,41 @@ CREATE TABLE IF NOT EXISTS orders (
 conn.commit()
 
 # Function to dispatch orders after the timer
-def dispatch_orders(table):
+def dispatch_orders(food_item):
     try:
-        st.write(f"Dispatching orders for Table {table}:")
-        for order in order_queue[table]:
-            st.write(f" - Deliver to Table {table} (ordered at {time.ctime(order['timestamp'])})")
-
-            # Retrieve the items from the order
-            items = order['items']
-            for item, quantity in items.items():
-                st.write(f"   - {quantity} x {item}")
-            
-            # Update order status to dispatched in the database
+        st.write(f"Dispatching orders for {food_item}:")
+        for order in order_queue[food_item]:
+            st.write(f" - Deliver to Table {order['table']} (ordered at {time.ctime(order['timestamp'])})")
             cursor.execute("UPDATE orders SET status = 'dispatched' WHERE timestamp = ?", (order['timestamp'],))
-        order_queue[table].clear()
+        order_queue[food_item].clear()
         conn.commit()
-        logging.info(f"Dispatched orders for Table {table}")
+        logging.info(f"Dispatched orders for {food_item}")
     except sqlite3.Error as e:
         logging.error(f"Database error during dispatch: {e}")
     except Exception as e:
         logging.error(f"Unexpected error during dispatch: {e}")
 
 # Function to queue new orders and dispatch after a delay
-def queue_order(items, table):
+def queue_order(food_item, table):
     try:
         current_time = time.time()
-        
-        # Serialize the items dictionary to store in the database
-        items_json = json.dumps(items)
-        
+        order = {"table": table, "timestamp": current_time}
+        order_queue[food_item].append(order)
+
         # Save to the database with pending status
-        cursor.execute("INSERT INTO orders (table_number, items, timestamp, status) VALUES (?, ?, ?, 'pending')", 
-                       (table, items_json, current_time))
+        cursor.execute("INSERT INTO orders (food_item, table_number, timestamp, status) VALUES (?, ?, ?, 'pending')", 
+                       (food_item, table, current_time))
         conn.commit()
 
-        # Add the order to the queue
-        order_queue[table].append({"items": items, "timestamp": current_time})
-        
-        if len(order_queue[table]) == 1:
-            st.write(f"New order received for Table {table}. Dispatching in 5 minutes.")
-            time.sleep(10)  # Short delay for demonstration
-            dispatch_orders(table)
+        # Start a timer if it's the first order for that food item
+        if len(order_queue[food_item]) == 1:
+            st.write(f"New order received for {food_item}. Dispatching in 5 minutes.")
+            # Using a shorter time (10 seconds) for demonstration
+            time.sleep(10)
+            dispatch_orders(food_item)
         else:
-            st.write(f"Another order for Table {table} added to the batch.")
-        logging.info(f"Order queued for Table {table} with items: {items}")
+            st.write(f"Another order for {food_item} added to the batch.")
+        logging.info(f"Order queued for {food_item} at table {table}")
     except sqlite3.Error as e:
         logging.error(f"Database error during order queuing: {e}")
     except Exception as e:
@@ -113,12 +103,8 @@ def view_order_history():
         orders = cursor.fetchall()
         if orders:
             for order in orders:
-                items = json.loads(order[2])  # Deserialize items from JSON
                 status = "Pending" if order[4] == 'pending' else "Dispatched"
-                st.write(f"Order ID: {order[0]}, Table: {order[1]}, Time: {time.ctime(order[3])}, Status: {status}")
-                st.write("Items:")
-                for item, quantity in items.items():
-                    st.write(f"  - {quantity} x {item}")
+                st.write(f"Order ID: {order[0]}, Food: {order[1]}, Table: {order[2]}, Time: {time.ctime(order[3])}, Status: {status}")
         else:
             st.write("No orders found.")
     except sqlite3.Error as e:
@@ -130,19 +116,13 @@ def view_order_history():
 def generate_summary_report():
     try:
         st.write("\n--- Order Summary Report ---")
-        cursor.execute("SELECT items FROM orders")
-        orders = cursor.fetchall()
-        
-        summary = defaultdict(int)
-        
-        for order in orders:
-            items = json.loads(order[0])
-            for item, quantity in items.items():
-                summary[item] += quantity
-        
-        for item, total in summary.items():
-            st.write(f"{item}: {total} total orders")
-        
+        cursor.execute("SELECT food_item, COUNT(*), SUM(CASE WHEN status='dispatched' THEN 1 ELSE 0 END) as dispatched_count FROM orders GROUP BY food_item")
+        report = cursor.fetchall()
+        if report:
+            for row in report:
+                st.write(f"Food Item: {row[0]}, Total Orders: {row[1]}, Dispatched: {row[2]}")
+        else:
+            st.write("No orders available to summarize.")
     except sqlite3.Error as e:
         logging.error(f"Database error during generating summary report: {e}")
     except Exception as e:
@@ -156,7 +136,13 @@ def main():
 
     if choice == "Take an Order":
         display_menu()
-        take_order()
+        food_item = st.selectbox("Select a food item", list(menu.keys()))
+        table = st.text_input("Enter Table number")
+        if st.button("Place Order"):
+            if food_item and table:
+                queue_order(food_item, table)
+            else:
+                st.write("Please provide both food item and table number.")
     
     elif choice == "Admin Panel":
         admin_choice = st.selectbox("Admin Options", ["View Order History", "Generate Summary Report"])
@@ -172,26 +158,5 @@ def main():
     elif choice == "Exit":
         st.write("Exiting the App")
 
-# Function to handle multiple item orders
-def take_order():
-    st.write("### Place an Order")
-    
-    table_number = st.text_input("Enter Table Number")
-    
-    st.write("Select Food Items:")
-    selected_items = {}
-    
-    for item, price in menu.items():
-        quantity = st.number_input(f"{item} (Quantity)", min_value=0, max_value=10, step=1)
-        if quantity > 0:
-            selected_items[item] = quantity
-    
-    if st.button("Place Order"):
-        if table_number and selected_items:
-            queue_order(selected_items, table_number)
-        else:
-            st.write("Please select at least one item and provide a table number.")
-
 if __name__ == "__main__":
     main()
-

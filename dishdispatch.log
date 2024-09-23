@@ -13,3 +13,30 @@
 2024-09-17 19:16:18,580 - INFO - Dispatched orders for Soda
 2024-09-17 19:16:29,015 - INFO - Dispatched orders for Pizza
 2024-09-17 19:16:29,015 - INFO - Order queued for Burger, Pasta, Soda, Pizza at table 2
+2024-09-17 20:09:18,947 - ERROR - Database error during order queuing: table orders has no column named items
+2024-09-17 20:11:30,902 - ERROR - Database error during order queuing: table orders has no column named items
+2024-09-17 20:11:51,913 - ERROR - Unexpected error during viewing order history: 'int' object has no attribute 'items'
+2024-09-17 20:11:59,907 - ERROR - Database error during generating summary report: no such column: items
+2024-09-17 20:12:05,471 - ERROR - Unexpected error during viewing order history: 'int' object has no attribute 'items'
+2024-09-17 20:12:34,118 - ERROR - Database error during order queuing: table orders has no column named items
+2024-09-17 20:12:49,709 - ERROR - Database error during order queuing: table orders has no column named items
+2024-09-17 20:12:59,048 - ERROR - Unexpected error during viewing order history: 'int' object has no attribute 'items'
+2024-09-17 20:13:08,297 - ERROR - Database error during generating summary report: no such column: items
+2024-09-17 20:17:58,522 - ERROR - Database error during order queuing: table orders has no column named items
+2024-09-17 20:21:40,086 - INFO - Dispatched orders for Burger
+2024-09-17 20:21:50,481 - INFO - Dispatched orders for Pizza
+2024-09-17 20:22:00,759 - INFO - Dispatched orders for Pasta
+2024-09-17 20:22:11,121 - INFO - Dispatched orders for Salad
+2024-09-17 20:22:21,500 - INFO - Dispatched orders for Soda
+2024-09-17 20:22:21,500 - INFO - Order queued for Burger, Pizza, Pasta, Salad, Soda at table 2
+2024-09-17 20:27:45,182 - ERROR - Database error while queuing order: table orders has no column named food_items
+2024-09-17 20:27:51,246 - ERROR - Database error during generating summary report: no such column: food_items
+2024-09-17 20:28:24,575 - ERROR - Database error while queuing order: table orders has no column named food_items
+2024-09-17 20:28:27,076 - ERROR - Database error while queuing order: table orders has no column named food_items
+2024-09-17 20:28:50,381 - ERROR - Database error while queuing order: table orders has no column named food_items
+2024-09-17 20:29:39,167 - ERROR - Database error while queuing order: table orders has no column named food_items
+2024-09-17 20:30:37,296 - ERROR - Database error while queuing order: table orders has no column named food_items
+2024-09-17 20:30:38,612 - ERROR - Database error while queuing order: table orders has no column named food_items
+2024-09-23 19:30:33,126 - ERROR - Database error while queuing order: table orders has no column named food_items
+2024-09-23 19:40:19,543 - INFO - Dispatched orders for Burger
+2024-09-23 19:40:19,543 - INFO - Order queued for Burger at table 2
